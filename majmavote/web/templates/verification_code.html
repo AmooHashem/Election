@@ -1,0 +1,20 @@
+{% extends "template.html" %}
+
+{% block content %}
+<div class="container">
+    <div style="padding:20%">
+    <form method="post" action="/login">
+        {% csrf_token %}
+  <div class="form-group">
+    <label for="code">کد تایید</label>
+    <input type="number" class="form-control" id="code" name="code" aria-describedby="codeHelp">
+    <small id="codeHelp" class="form-text text-muted">کد پیام شده را وارد کنید</small>
+  </div>
+        <input type="hidden" name="phone_number" value="{{phone}}">
+  <button type="submit" class="btn btn-primary btn-lg btn-block">ورود</button>
+</form>
+</div>
+    </div>
+
+{% endblock %}
+
