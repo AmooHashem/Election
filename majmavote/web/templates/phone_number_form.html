@@ -3,11 +3,16 @@
 {% block content %}
 <div class="container">
     <div style="padding:20%">
-    <form method="post">
+        {% if error %}
+        <div class="alert alert-danger" role="alert">
+            {{error}}
+        </div>
+        {% endif %}
+    <form method="post" action="/verification">
         {% csrf_token %}
   <div class="form-group">
     <label for="phone_number">شماره تلفن همراه</label>
-    <input type="number" class="form-control" name="phone_number" id="phone_number" aria-describedby="phoneHelp" placeholder="913XXXXXXX">
+    <input type="number" required="required" class="form-control" name="phone_number" id="phone_number" aria-describedby="phoneHelp" placeholder="913XXXXXXX">
     <small id="phoneHelp" class="form-text text-muted">شماره تلفن خود را به فرمت مشابه پر کنید</small>
   </div>
   <button type="submit" class="btn btn-primary btn-lg btn-block">ارسال کد تایید</button>

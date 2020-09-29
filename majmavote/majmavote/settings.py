@@ -130,3 +130,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 #     # ... your other backends
 #     'web.auth_backend.PasswordlessAuthBackend',
 # )
+
+
+LOGIN_URL = '/'
+LOGIN_REDIRECT_URL = '/'

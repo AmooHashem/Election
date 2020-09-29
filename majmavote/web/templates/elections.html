@@ -1,9 +1,68 @@
 {% extends "template.html" %}
 
 {% block content %}
-<div class="container">
-    elections
+<div class="container" style="padding:5%">
+    {% for election in elections %}
+    <div class="card mb-10" >
+  <div class="row no-gutters">
+    <div class="col-md-2">
+    </div>
+    <div class="col-md-6">
+      <div class="card-body">
+        <h3 class="card-title">{{election.title}}</h3>
+        <p class="card-text">
+<b>            نامزد ها :</b>
+            <ul>
+            {% for candidate in election.candidates %}
+            <li> {{candidate}}</li>
+            {% endfor %}
+          </ul>
+        </p>
+        <p class="card-text"><b>تعداد واجدین شرایط رای‌دهنده : </b> {{election.voters_count}} نفر</p>
+        <p class="card-text"><b>پایان مهلت رای‌گیری :</b> <small class="text-muted" id="election_{{election.id}}"></small></p>
+      </div>
+    </div>
+      <div class="col-md-4" style="padding:5%;">
+          {% if election.can_vote is False %}
+          <button type="button" class="btn btn-danger btn-lg btn-block"  disabled="disabled">شما امکان رای دادن در این انتخابات را ندارید</button>
+          {% elif election.is_expire is True %}
+          <button type="button" class="btn btn-info btn-lg btn-block"  disabled="disabled">مهلت انتخابات به پایان رسیده است</button>
+          {% elif election.is_voted is True %}
+          <button type="button" class="btn btn-success btn-lg btn-block"  disabled="disabled">شما قبلا رای داده‌اید</button>
+          {% else %}
+          <a type="button" class="btn btn-success btn-lg btn-block" href="/election/{{election.id}}" >رای دادن !!!</a>
+          {% endif %}
+
+    </div>
+  </div>
 </div>
+    {% endfor %}
+</div>
+
+
+<script>
+{% for election in elections %}
+var election_{{election.id}}=setInterval(function() { calcRemaining("election_{{election.id}}", {{ election.expire_time }}) }, 1000);
+{% endfor %}
+
+function calcRemaining(id, ramaining_time){
+  var now = new Date().getTime();
+  var distance = ramaining_time - now;
+  var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+  var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+  var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+  document.getElementById(id).innerHTML = days + " روز  " + hours + " ساعت "
+  + minutes + " دقیقه " + seconds + " ثانیه ";
+
+  // If the count down is finished, write some text
+  if (distance < 0) {
+    clearInterval(id);
+    document.getElementById(id).innerHTML = "پایان یافته است";
+  }
+}
+</script>
 
 {% endblock %}
 

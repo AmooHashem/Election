@@ -1,0 +1,34 @@
+{% extends "template.html" %}
+
+{% block content %}
+<div class="container" style="padding:5%">
+    {{name}}
+</div>
+
+
+<script>
+{% for election in elections %}
+var election_{{election.id}}=setInterval(function() { calcRemaining("election_{{election.id}}", {{ election.expire_time }}) }, 1000);
+{% endfor %}
+
+function calcRemaining(id, ramaining_time){
+  var now = new Date().getTime();
+  var distance = ramaining_time - now;
+  var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+  var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+  var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+  document.getElementById(id).innerHTML = days + " روز  " + hours + " ساعت "
+  + minutes + " دقیقه " + seconds + " ثانیه ";
+
+  // If the count down is finished, write some text
+  if (distance < 0) {
+    clearInterval(id);
+    document.getElementById(id).innerHTML = "پایان یافته است";
+  }
+}
+</script>
+
+{% endblock %}
+

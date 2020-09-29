@@ -3,6 +3,11 @@
 {% block content %}
 <div class="container">
     <div style="padding:20%">
+        {% if error %}
+        <div class="alert alert-danger" role="alert">
+            {{error}}
+        </div>
+        {% endif %}
     <form method="post" action="/login">
         {% csrf_token %}
   <div class="form-group">

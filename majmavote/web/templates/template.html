@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="http://cdn.font-store.ir/shahab.css">
     <link rel="stylesheet" href="static/css/majmavote.css">
 
-    <title>مجمع‌یار | سامانه انتخابات</title>
+    <title>مجمع یار | سامانه انتخابات</title>
   </head>
   <body>
   <nav class="navbar navbar-dark bg-dark">
@@ -18,6 +18,9 @@
     <img src="https://getbootstrap.com/docs/4.5/assets/brand/bootstrap-solid.svg" width="30" height="30" class="d-inline-block align-top" alt="" loading="lazy">
     مجمع‌ یار | سامانه انتخابات
   </a>
+    {% if user.is_authenticated %}
+    <a type="button" class="btn btn-danger" href="/logout">خروج</a>
+    {% endif %}
   </nav>
     <div id="content">
         {% block content %}{% endblock %}
