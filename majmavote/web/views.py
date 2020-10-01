@@ -203,6 +203,10 @@ class RegisterView(View):
                 voters.append(voter)
                 election.voters.add(voter)
                 election.save()
+            else:
+                voter = Voter.objects.get(phone_number=phone)
+                election.voters.add(voter)
+                election.save()
         elections = Election.objects.all()
         context = {'elections': elections, 'voters': voters}
         return render(request, 'register.html', context)
