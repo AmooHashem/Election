@@ -44,7 +44,7 @@ class Verification(View):
         try:
             voter = Voter.objects.get(phone_number=phone)
         except Voter.DoesNotExist:
-            context = {'error': 'شماره شما در لیست رای‌دهندگان پیدا نشد.'}
+            context = {'error': 'شماره شما در لیست رای‌دهندگان پیدا نشد.در صورتی که از اعضا رسمی هستید با مدیر مجمع تماس حاصل فرمایید'}
             return render(request, 'phone_number_form.html', context)
         activate_code = ''.join(["{}".format(randint(0, 9)) for num in range(0, 5)])
         voter.activate_code = activate_code
