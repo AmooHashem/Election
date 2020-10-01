@@ -204,5 +204,5 @@ class RegisterView(View):
                 election.voters.add(voter)
                 election.save()
         elections = Election.objects.all()
-        context = {'elections': elections}
+        context = {'elections': elections, 'voters': voters}
         return render(request, 'register.html', context)

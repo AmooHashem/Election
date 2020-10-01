@@ -24,6 +24,34 @@
             </form>
         </div>
     </div>
+    {% if voters %}
+     <div class="card text-center">
+        <div class="card-header">
+            <h4>نتایج انتخابات {{election.title}}</h4>
+        </div>
+        <div class="card-body">
+            <h4>افراد زیر با موفقیت اضافه شدند</h4>
+
+            <table class="table table-hover table-info">
+                <thead>
+                <tr>
+                    <th scope="col">نام</th>
+                    <th scope="col">شماره تلفن</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for person in voters %}
+                <tr>
+                    <td>{{person.name}}</td>
+                    <td>{{person.phone_number}}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+    {% endif %}
 </div>
 
 
