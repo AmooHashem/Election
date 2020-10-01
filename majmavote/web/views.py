@@ -1,3 +1,4 @@
+import uuid
 from itertools import chain
 from random import randint
 
@@ -199,6 +200,7 @@ class RegisterView(View):
                 user.set_password(phone)
                 user.save()
                 voter = Voter(user=user, phone_number=phone, name=name)
+                voter.uuid = uuid.uuid4()
                 voter.save()
                 voters.append(voter)
                 election.voters.add(voter)
