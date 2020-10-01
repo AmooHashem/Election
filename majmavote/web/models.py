@@ -14,7 +14,7 @@ from .vote_exception import MaxVoteException, ExpireElectionException, VoterPerm
 
 
 class Voter(models.Model):
-    uuid = models.UUIDField(default=uuid.uuid4(), editable=False, max_length=64)
+    uuid = models.UUIDField(default=uuid.uuid4(), editable=False)
     user = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE)
     phone_number = PhoneNumberField(unique=True)
     activate_code = models.CharField(max_length=5, blank=True, default='')
