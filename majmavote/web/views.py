@@ -192,7 +192,7 @@ class RegisterView(View):
         election = Election.objects.get(id=request.POST['election'])
         for i in range(sheet.nrows):
             name = sheet.cell_value(i, 1)
-            phone = '+' + str(int(sheet.cell_value(i, 0)))
+            phone = '+98' + str(int(sheet.cell_value(i, 0)))
             print(phone)
             if not Voter.objects.filter(phone_number=phone).exists():
                 user = User(username=phone)
