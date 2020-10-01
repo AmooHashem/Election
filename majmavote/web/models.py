@@ -9,11 +9,12 @@ from phonenumber_field.modelfields import PhoneNumberField
 from .vote_exception import MaxVoteException, ExpireElectionException, VoterPermissionException
 
 
+
 # Create your models here.
 
 
 class Voter(models.Model):
-    uuid = models.CharField(default=uuid.uuid4().hex[:12], editable=False, max_length=64)
+    uuid = models.UUIDField(default=uuid.uuid4(), editable=False, max_length=64)
     user = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE)
     phone_number = PhoneNumberField(unique=True)
     activate_code = models.CharField(max_length=5, blank=True, default='')
