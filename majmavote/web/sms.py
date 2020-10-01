@@ -15,7 +15,7 @@ class Sms:
         }
         bulk_id = Sms.client.send_pattern(
             "3ncl8tmub0",
-            "+982000505",  # originator
+            "+9850000204012358",  # originator
             phone_code,  # recipients
             pattern_values)  # message
         # print(bulk_id)
