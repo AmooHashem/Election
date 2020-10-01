@@ -1,0 +1,75 @@
+{% extends "template.html" %}
+
+{% block content %}
+<div class="container" style="padding:5%">
+    <div class="card text-center">
+        <div class="card-header">
+            <h4>نتایج انتخابات {{election.title}}</h4>
+        </div>
+        <div class="card-body">
+            <h4>کسانی که در انتخابات شرکت نکرده‌اند</h4>
+            <table class="table table-hover table-dark">
+                <thead>
+                <tr>
+                    <th scope="col">نام و نام خانوادگی</th>
+                    <th scope="col">شماره تلفن همراه</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for person in not_voted_list %}
+                <tr>
+                    <td>{{person.name}}</td>
+                    <td>{{person.phone_number|slugify|slice:"2:"}}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <hr/>
+            <h4>آرا</h4>
+            <table class="table table-hover table-info">
+                <thead>
+                <tr>
+                    <th scope="col">شماره پیگیری</th>
+                    <th scope="col">رای</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for person in voted_list %}
+                <tr>
+                    <td>{{person.uuid}}</td>
+                    <td>{{person.name}}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+            <hr/>
+            <h4>نتایج</h4>
+            <table class="table table-hover table-success">
+                <thead>
+                <tr>
+                    <th scope="col">کاندیدا</th>
+                    <th scope="col">تعداد رای</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for person in candidate_result %}
+                <tr>
+                    <td>{{person.name}}</td>
+                    <td>{{person.vote_count}}</td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <th scope="col">تعداد کل آرا</th>
+                    <th scope="col">{{total_vote}}</th>
+                </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+

@@ -1,0 +1,31 @@
+{% extends "template.html" %}
+
+{% block content %}
+<div class="container" style="padding:5%">
+    <div class="card text-center">
+        <div class="card-header">
+            ثبت نام اعضا
+        </div>
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                    {% for election in elections %}
+                <div style="padding:2%">
+                    <input required="required" class="form-check-input" name="election" type="radio" value="{{election.id}}" id="election_{{election.id}}">
+                    <label class="form-check-label" for="election_{{election.id}}">
+                       {{election.title}}
+                    </label>
+                </div >
+                    {% endfor %}
+                <div style="padding:2%">فایل اسامی
+                <input type="file" name="file">
+                </div>
+                <button type="submit" class="btn btn-success btn-lg btn-block">ثبت</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+

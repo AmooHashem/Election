@@ -3,9 +3,12 @@ from random import randint
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 
 from django.utils import timezone
+import xlrd
+
 
 
 # Create your views here.
@@ -148,3 +151,58 @@ class VoteView(View):
             context = {'error': 'شما اجازه رای دادن ندارید'}
         return render(request, 'vote_response.html', context)
 
+
+class ResultView(View):
+
+    def get(self, request, ids):
+        try:
+            election = Election.objects.get(id=ids)
+        except Election.DoesNotExist:
+            return ElectionView.as_view()(request)
+        votes = Vote.objects.filter(candidate__election=election)
+        voted_list = []
+        for vote in votes:
+            voted_list.append({'name': vote.candidate.name, 'uuid': vote.get_voter_uuid()})
+        not_voted_list = []
+        for voter in election.voters.all():
+            if not Vote.objects.filter(candidate__election=election, voter=voter).exists():
+                not_voted_list.append(voter)
+        total_vote = votes.count()
+        candidates = Candidate.objects.filter(election=election)
+        candidate_result = []
+        for candidate in candidates:
+            candidate_result.append({'name': candidate.name, 'vote_count': candidate.get_vote_count()})
+        context = {'voted_list': voted_list, 'not_voted_list': not_voted_list, 'election': election,
+                   'total_vote': total_vote, 'candidate_result': candidate_result}
+        return render(request, 'vote_result.html', context)
+
+
+class RegisterView(View):
+
+    def get(self, request):
+        elections = Election.objects.all()
+        context = {'elections': elections}
+        return render(request, 'register.html', context)
+
+    def post(self, request):
+        file = request.FILES['file']
+        book = xlrd.open_workbook(file_contents=file.read())
+        sheet = book.sheet_by_index(0)
+        voters = []
+        election = Election.objects.get(id=request.POST['election'])
+        for i in range(sheet.nrows):
+            name = sheet.cell_value(i, 1)
+            phone = '+' + str(int(sheet.cell_value(i, 0)))
+            print(phone)
+            if not Voter.objects.filter(phone_number=phone).exists():
+                user = User(username=phone)
+                user.set_password(phone)
+                user.save()
+                voter = Voter(user=user, phone_number=phone, name=name)
+                voter.save()
+                voters.append(voter)
+                election.voters.add(voter)
+                election.save()
+        elections = Election.objects.all()
+        context = {'elections': elections}
+        return render(request, 'register.html', context)
