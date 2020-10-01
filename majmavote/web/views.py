@@ -13,6 +13,7 @@ from django.views import View
 
 from .models import Voter, Election, Candidate, Vote
 from .sms import Sms
+from .vote_exception import MaxVoteException, ExpireElectionException, VoterPermissionException
 
 
 def index(request):
@@ -131,3 +132,19 @@ class VoteView(View):
                    'candidates': candidates
                    }
         return render(request, 'vote.html', context)
+
+    def post(self, request, ids):
+        voter = Voter.objects.get(user=request.user)
+        candidate = Candidate.objects.get(id=request.POST['voted_candidate'])
+        vote = Vote(voter=voter, candidate=candidate)
+        try:
+            vote.save()
+            context = {'uuid': vote.get_voter_uuid(), 'candidate': candidate.name}
+        except MaxVoteException:
+            context = {'error': 'شما قبلا رای داده‌اید'}
+        except ExpireElectionException:
+            context = {'error': 'مهلت رای گیری تمام شده است'}
+        except VoterPermissionException:
+            context = {'error': 'شما اجازه رای دادن ندارید'}
+        return render(request, 'vote_response.html', context)
+

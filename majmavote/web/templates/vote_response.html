@@ -1,0 +1,31 @@
+{% extends "template.html" %}
+
+{% block content %}
+<div class="container" style="padding:5%">
+    <div class="card text-center">
+        <div class="card-header">
+            {% if error %}
+            <div class="alert alert-danger" role="alert">
+            {{error}}
+            </div>
+            {% else %}
+            <div class="alert alert-success" role="alert">
+            <h4>رای شما با موفقیت ثبت شد</h4>
+            </div>
+            {% endif %}
+        </div>
+        <div class="card-body">
+            {% if not error %}
+            <div class="alert alert-primary" role="alert">
+            <h6>رای شما :{{candidate}} </h6>
+            <h6>کد پیگیری (پس از پایان انتخابات میتوانید اصالت رای ثبت شده خود را با این کد بررسی نمایید) :{{uuid}} </h6>
+            </div>
+            {% endif %}
+            <a href="/election" class="btn btn-info btn-lg btn-block"> بازگشت </a>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
