@@ -7,6 +7,8 @@ from django.urls import path, include, re_path
 from majmavote import settings
 from . import views
 from .views import Verification, Login, ElectionView, VoteView, ResultView, RegisterView
+from django.conf.urls.static import static
+
 
 urlpatterns = [
     path('verification', Verification.as_view()),
@@ -17,4 +19,5 @@ urlpatterns = [
     re_path(r'^election/(\d)', login_required((VoteView.as_view()))),
     re_path(r'^election/result/(\d)', staff_member_required((ResultView.as_view()))),
     path('', views.index, name='index'),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(settings.STATIC_URL,
+                                                                           document_root=settings.STATIC_ROOT)

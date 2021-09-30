@@ -6,6 +6,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
+from django.db.models import Count
+
 
 from django.utils import timezone
 import xlrd
@@ -100,7 +102,7 @@ class ElectionView(View):
                        'voters_count': len(voters_list),
                        'can_vote': True if voter in voters_list else False,
                        'is_expire': True if election.expire_time < timezone.now() else False,
-                       'is_voted': Vote.objects.filter(voter=voter, candidate__election=election).count() >= election.max_select,
+                       'is_voted': Vote.objects.filter(voter=voter, candidate__election=election).exists(),
                        'candidates': candidates
                        }
             elections.append(el_dict)
@@ -112,8 +114,8 @@ def check_can_vote(voter, election):
     voters_list = list(election.voters.all())
     can_vote = True if voter in voters_list else False
     is_expire = True if election.expire_time < timezone.now() else False
-    voted_count = Vote.objects.filter(voter=voter, candidate__election=election).count()
-    if not can_vote or is_expire or voted_count >= election.max_select:
+    is_voted = Vote.objects.filter(voter=voter, candidate__election=election).exists()
+    if not can_vote or is_expire or is_voted:
         return False
     return True
 
@@ -131,6 +133,7 @@ class VoteView(View):
         candidates = Candidate.objects.filter(election=election)
         context = {'name': election.name,
                    'id': election.id,
+                   'max_vote': election.max_select,
                    'title': election.title,
                    'expire_time': int(election.expire_time.timestamp() * 1000),
                    'candidates': candidates
@@ -138,18 +141,26 @@ class VoteView(View):
         return render(request, 'vote.html', context)
 
     def post(self, request, ids):
+        voted_list = request.POST.getlist('voted_candidate')
+        if len(voted_list) > Election.objects.get(id=ids).max_select:
+            context = {'error': 'تعداد کاندید‌های انتخابی بیشتر از حدمجاز است'}
+            return render(request, 'vote_response.html', context)
         voter = Voter.objects.get(user=request.user)
-        candidate = Candidate.objects.get(id=request.POST['voted_candidate'])
-        vote = Vote(voter=voter, candidate=candidate)
-        try:
-            vote.save()
-            context = {'uuid': vote.get_voter_uuid(), 'candidate': candidate.name}
-        except MaxVoteException:
+        if Vote.objects.filter(voter=voter, candidate__election__id=ids).exists():
             context = {'error': 'شما قبلا رای داده‌اید'}
-        except ExpireElectionException:
-            context = {'error': 'مهلت رای گیری تمام شده است'}
-        except VoterPermissionException:
-            context = {'error': 'شما اجازه رای دادن ندارید'}
+            return render(request, 'vote_response.html', context)
+        for candidate_id in voted_list:
+            candidate = Candidate.objects.get(id=candidate_id)
+            vote = Vote(voter=voter, candidate=candidate)
+            try:
+                vote.save()
+                context = {'uuid': vote.get_voter_uuid(), 'candidate': candidate.name}
+            except MaxVoteException:
+                context = {'error': 'شما قبلا رای داده‌اید'}
+            except ExpireElectionException:
+                context = {'error': 'مهلت رای گیری تمام شده است'}
+            except VoterPermissionException:
+                context = {'error': 'شما اجازه رای دادن ندارید'}
         return render(request, 'vote_response.html', context)
 
 
@@ -161,20 +172,25 @@ class ResultView(View):
         except Election.DoesNotExist:
             return ElectionView.as_view()(request)
         votes = Vote.objects.filter(candidate__election=election)
-        voted_list = []
+        voted_list = {}
         for vote in votes:
-            voted_list.append({'name': vote.candidate.name, 'uuid': vote.get_voter_uuid()})
+            if vote.get_voter_uuid() in voted_list:
+                voted_list[vote.get_voter_uuid()].append(vote.candidate.name)
+            else:
+                voted_list[vote.get_voter_uuid()] = []
+                voted_list[vote.get_voter_uuid()].append(vote.candidate.name)
         not_voted_list = []
         for voter in election.voters.all():
             if not Vote.objects.filter(candidate__election=election, voter=voter).exists():
                 not_voted_list.append(voter)
-        total_vote = votes.count()
+        total_vote = Vote.objects.filter(candidate__election=election).values('voter')\
+            .annotate(Count('voter', distinct=True))
         candidates = Candidate.objects.filter(election=election)
         candidate_result = []
         for candidate in candidates:
             candidate_result.append({'name': candidate.name, 'vote_count': candidate.get_vote_count()})
         context = {'voted_list': voted_list, 'not_voted_list': not_voted_list, 'election': election,
-                   'total_vote': total_vote, 'candidate_result': candidate_result}
+                   'total_vote': len(total_vote), 'candidate_result': candidate_result}
         return render(request, 'vote_result.html', context)
 
 

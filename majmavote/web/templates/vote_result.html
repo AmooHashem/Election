@@ -34,10 +34,10 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% for person in voted_list %}
+                {% for person , value in voted_list.items %}
                 <tr>
-                    <td>{{person.uuid}}</td>
-                    <td>{{person.name}}</td>
+                    <td>{{person}}</td>
+                    <td>{{value}}</td>
                 </tr>
                 {% endfor %}
                 </tbody>

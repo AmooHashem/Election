@@ -30,7 +30,7 @@
         {% csrf_token %}
         {% for candidate in candidates %}
         <div class="form-check" style="padding-bottom:3%">
-        <input required="required" class="form-check-input" name="voted_candidate" type="radio" value="{{candidate.id}}" id="candidate_{{candidate.id}}">
+        <input class="form-check-input" name="voted_candidate" type="checkbox" value="{{candidate.id}}" id="candidate_{{candidate.id}}">
         <label class="form-check-label" for="candidate_{{candidate.id}}">
             {{candidate.name}}
         </label>
@@ -68,6 +68,18 @@ function calcRemaining(id, ramaining_time){
   }
 }
 </script>
+<script>
+var checks = document.querySelectorAll(".form-check-input");
+var max = {{max_vote}};
+for (var i = 0; i < checks.length; i++)
+  checks[i].onclick = selectiveCheck;
+function selectiveCheck (event) {
+  var checkedChecks = document.querySelectorAll(".form-check-input:checked");
+  if (checkedChecks.length >= max + 1)
+    return false;
+}
+</script>
+
 
 {% endblock %}
 
